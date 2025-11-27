@@ -1,4 +1,4 @@
-# Math-App
+# Code-Generator
 Author: Yomi Adamo
 
 Hello, this was a test to see how how well the Llama 3.2 3B model worked with generating runnable python code, as well as storing the code and automatically running it.
