@@ -1,59 +1,104 @@
 # Code-Generator
-Author: Yomi Adamo
 
-Hello, this was a test to see how how well the Llama 3.2 3B model worked with generating runnable python code, as well as storing the code and automatically running it.
+An AI-powered code generation and auto-execution agent built with FastAPI and a locally hosted LLM (Llama 3.2 3B via Ollama). Given a natural language description, the system generates a runnable Python script, saves it to disk, and automatically executes it — returning both the code and any output or plots produced.
 
-## How To Use
-1. Install Ollama Model
-~~~bash
+---
+
+## Purpose
+
+Writing boilerplate code for data analysis, visualization, and scripting tasks is repetitive. This project explores whether a small, locally hosted LLM can reliably generate syntactically correct, runnable Python from plain English descriptions — and then execute that code without human intervention. The auto-run feature closes the loop between code generation and validation, making it possible to verify model output immediately.
+
+---
+
+## Technologies Used
+
+| Technology | Role |
+|---|---|
+| Python | Core language |
+| FastAPI | REST API framework |
+| Ollama | Local LLM inference engine |
+| Llama 3.2 3B | Language model for code generation |
+| Uvicorn | ASGI server |
+| Matplotlib | Visualization (for generated plot scripts) |
+| Requests | HTTP client for model communication |
+
+---
+
+## Setup & Installation
+
+### Prerequisites
+- Python 3.9+
+- [Ollama](https://ollama.com) installed on your machine
+
+### Steps
+
+**1. Install Ollama**
+```bash
 curl -fsSL https://ollama.com/install.sh | sh
-~~~
+```
 
-2. Pull Llama 3.2 3B model
-~~~bash
-ollama pull llama3.2:3B
-~~~
+**2. Pull the Llama 3.2 3B model**
+```bash
+ollama pull llama3.2:3b
+```
 
-3. Clone the directory
-~~~bash
+**3. Clone the repository**
+```bash
 git clone https://github.com/yomi-adamo/Code-Generator.git
-
 cd Code-Generator
-~~~
+```
 
-4. Create virtual environment 
-~~~bash
+**4. Create and activate a virtual environment**
+```bash
 python3 -m venv venv
-~~~
-
-5. Activate the virtual environmet and install dependencies
-~~~bash
 source venv/bin/activate
+```
 
-pip install fastapi uvicorn requests
-~~~
+**5. Install dependencies**
+```bash
+pip install fastapi uvicorn requests matplotlib
+```
 
-6. Run the code
-~~~bash
+**6. Run the server**
+```bash
 uvicorn main:app --reload
-~~~
+```
 
-7. Example
-~~~bash
+---
+
+## Usage
+
+Send a POST request to the `/generate-code` endpoint with a natural language description and an `auto_run` flag:
+
+```bash
 curl -X POST http://localhost:8000/generate-code \
   -H "Content-Type: application/json" \
   -d '{
-    "description": "Create a Python script that generates a sine wave and plots it using matplotlib. The wave should have a frequency of 5 Hz, be sampled at 100 Hz, and show 2 seconds of data.",
+    "description": "Create a Python script that generates a sine wave and plots it using matplotlib.",
     "auto_run": true
   }'
-~~~
+```
 
-8. Find code and plot image
-~~~bash
-cd generated_code
-~~~
+When `auto_run` is set to `true`, the API saves the generated script and executes it automatically, returning any console output or confirming plot generation.
 
-9. Open Image
-~~~bash
-eog <image file>
-~~~
+---
+
+## Key Features
+
+- **Natural language to code** — Describe what you want in plain English; the LLM generates a complete Python script.
+- **Auto-execution** — With `auto_run: true`, generated code is saved and run immediately without manual intervention.
+- **Local inference** — Runs entirely on-device via Ollama; no external API calls or usage costs.
+- **FastAPI interface** — Clean REST API with interactive Swagger docs at `/docs`.
+- **Matplotlib support** — Tested with visualization tasks including waveform and signal plots.
+
+---
+
+## My Contribution
+
+This was a solo personal project. I built the entire system independently: the FastAPI application structure, the Ollama prompt pipeline for code generation, the file-save and subprocess-based auto-execution logic, and all documentation. I also debugged a key issue where matplotlib's `show()` function caused the subprocess to hang in non-interactive environments, and resolved it by configuring a non-interactive backend.
+
+---
+
+## Reflection
+
+This project pushed me to think carefully about the boundary between AI-generated output and executable code — a non-trivial problem when the model occasionally produces incomplete or syntactically invalid scripts. Handling execution failures gracefully and sanitizing model output before running it were the most technically interesting challenges. It also deepened my understanding of subprocess management and local LLM prompt engineering, both of which are directly relevant to my interest in edge-deployed AI systems.
